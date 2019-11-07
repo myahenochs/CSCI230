@@ -1,7 +1,7 @@
 //Myah Enochs
 //CSCI230
 //Fall 2019
-//Program 2 Class Definitions
+//Program 3 Class Definitions
 
 #include "player3.h"
 
@@ -230,7 +230,7 @@ void PlayerClass::WriteWeaponHistory(ostream &out){
         out << PlayerTypeChar << DEL;
         weaponList.Reset();
         for(int i = 0; i < weaponList.Length(); i++){
-            //
+            //Ask how the fuck to do this on Friday (or look it up?)
         }
     }
 }

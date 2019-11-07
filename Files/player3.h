@@ -1,12 +1,8 @@
 //Myah Enochs
 //CSCI230
 //Fall 2019
-//Program 2 Class Declaration
-//This class is a player, including a weapon and armor.
-
-//Additional Notes: Alex T. helped me a lot with this program by looking for bugs with me,
-    //but he did recommend some changes, like how to do the constants.
-    //Helped Olivia and Alexandria with their programs.
+//Program 3 Class Declaration
+//This class is a player that includes weapons and armor.
 
 #ifndef _PLAYERCLASSH
 #define _PLAYERCLASSH
