@@ -290,12 +290,11 @@ void PlayerClass::LoseWeapon(){
 }
 
 bool PlayerClass::SwapWeapon(string weapon){
-    bool swapped = false;
-    if(weaponList.IsPresent(weapon)){
+    bool swap = weaponList.IsPresent(weapon);
+    if(swap){
         SetWeapon(weapon);
     }
-
-    return swapped;
+    return swap;
 }
 
 bool PlayerClass::LearnedWeapon(string weapon){
