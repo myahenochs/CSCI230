@@ -281,9 +281,9 @@ void PlayerClass::LoseArmor(){
 
 void PlayerClass::LoseWeapon(){
     if (PlayerSet()){
+        weaponList.Delete(currentWeapon.name);
         currentWeapon.set = false;
     }
-
     return;
 }
 
@@ -296,12 +296,11 @@ bool PlayerClass::SwapWeapon(string weapon){
 }
 
 bool PlayerClass::LearnedWeapon(string weapon){
-    bool learned = false;
-    if(PlayerSet() && WeaponExists(weapon)){
-        learned = true;
+    bool learn = PlayerSet() && WeaponExists(weapon);
+    if(learn){
         weaponList.Insert(weapon);
     }
-    return learned;
+    return learn;
 }
 
 void PlayerClass::Amnesia(){
@@ -343,21 +342,18 @@ bool PlayerClass::ValidatePlayer(string newName) const{
 bool PlayerClass::NameExists(string newName, string inFile) const{
     bool valid = false;
     ifstream fin;
-    string fName, uName;
-
-    uName = Ucase(newName);
+    string fName, uName = Ucase(newName);
 
     fin.open(inFile.c_str());
     do{
         getline(fin, fName, DEL);
-        fName = Ucase(fName);
-        if (fName != uName){
+        if (Ucase(fName) != uName){
             fin.ignore(255, END);
         }
-    } while (fName != uName && !fin.eof());
+    } while (Ucase(fName) != uName && !fin.eof());
     fin.close();
 
-    if(fName == uName){
+    if(Ucase(fName) == uName){
         valid = true;
     }
 
@@ -386,23 +382,17 @@ bool PlayerClass::WeaponExists(string newWeapon) const{
 }
 
 bool PlayerClass::ArmorExists(string newArmor) const{
-    bool valid = false;
-
+    bool valid = (Ucase(newArmor) == NO_INPUT);
     //Checks for NONE seperately because StringToArmorType returns NONE as default.
-    if(Ucase(newArmor) == NO_INPUT){
-        valid = true;
-    }
-    else{
+    if(!valid){
         switch (StringToArmorType(newArmor)){
             case BREASTPLATE:
             case CHAINMAIL:
             case LEATHER:
             case TACTICALVEST:
                 valid = true;
-                break;
         }
     }
-
     return valid;
 }
 
@@ -426,7 +416,6 @@ void PlayerClass::WriteZombie(ostream& out) const{
     out << type.zombie.iDate.month << DATE_SEP;
     if (type.zombie.iDate.day < 10) {out << 0;};
     out << type.zombie.iDate.day << DATE_SEP;
-    if (type.zombie.iDate.year < 10) {out << 0;};
     out << type.zombie.iDate.year << DEL;
     out << GetBrawn() << DEL;
     out << GetDex() << DEL;
@@ -448,21 +437,17 @@ void PlayerClass::WriteArmor(ostream& out) const{
 //PRIVATE TRANSFORMERS -----------------------------------------
 
 void PlayerClass::SetValidPlayer(string newName){
-
     if(NameExists(newName, HUMANS_FILE)){
         SetHuman(newName);
     }
     else if (NameExists(newName, ZOMBIES_FILE)){
         SetZombie(newName);
     }
-
-    return;
 }
 
 void PlayerClass::SetHuman(string newName){
     ifstream fin;
     string fName;
-
     newName = Ucase(newName);
 
     fin.open(HUMANS_FILE.c_str());
@@ -495,8 +480,6 @@ void PlayerClass::SetHuman(string newName){
         fin >> health;
     }
     fin.close();
-
-    return;
 }
 
 void PlayerClass::SetZombie(string newName){
@@ -543,8 +526,6 @@ void PlayerClass::SetZombie(string newName){
         fin >> health;
     }
     fin.close();
-
-    return;
 }
 
 void PlayerClass::SetValidWeapon(string newWeapon){
@@ -564,21 +545,12 @@ void PlayerClass::SetValidWeapon(string newWeapon){
         currentWeapon.name = fWpn;
         fin >> currentWeapon.damage;
     }
-
-    return;
 }
 
 void PlayerClass::SetValidArmor(string newArmor){
     armor.name = StringToArmorType(newArmor);
     armor.dav = ArmorTypeToDAV(StringToArmorType(ArmorName()));
-    if(armor.name == NONE){ //if the client changes the armor to NONE, the armor is not set
-            armor.set = false;
-        }
-        else{
-            armor.set = true;
-        }
-
-    return;
+    armor.set = (armor.name == NONE);
 }
 
 
@@ -594,7 +566,6 @@ char PlayerClass::PlayerTypeChar(PlayerType playerType) const{
 }
 
 PlayerClass::PlayerType PlayerClass::CharToPlayerType(char character) const{
-
     switch(character){
         case 'P':
         case 'p': return PROTECTOR;
@@ -607,7 +578,6 @@ PlayerClass::PlayerType PlayerClass::CharToPlayerType(char character) const{
 }
 
 char PlayerClass::ArmorTypeToChar(ArmorType armorType) const{
-
     switch(armorType){
         case NONE: return 'N';
         case BREASTPLATE: return 'B';
@@ -619,24 +589,17 @@ char PlayerClass::ArmorTypeToChar(ArmorType armorType) const{
 }
 
 PlayerClass::ArmorType PlayerClass::CharToArmorType(char character) const{
-
-    switch(character){
-        case 'n':
+    switch(toupper(character)){
         case 'N': return NONE;
-        case 'b':
         case 'B': return BREASTPLATE;
-        case 'c':
         case 'C': return CHAINMAIL;
-        case 'l':
         case 'L': return LEATHER;
-        case 't':
         case 'T': return TACTICALVEST;
         default: return NONE;
     }
 }
 
 char PlayerClass::CampaignTypeToChar(CampaignType cType) const{
-
     switch(cType){
         case GATHER: return 'G';
         case SPY: return 'S';
@@ -647,42 +610,24 @@ char PlayerClass::CampaignTypeToChar(CampaignType cType) const{
 }
 
 PlayerClass::CampaignType PlayerClass::CharToCampaignType(char character) const{
-    
-    switch(character){
-        case 'g':
+    switch(toupper(character)){
         case 'G': return GATHER;
-        case 's':
         case 'S': return SPY;
-        case 't':
         case 'T': return TRAVELER;
-        case 'w':
         case 'W': return WARRIOR;
         default: return GATHER;
     }
 }
 
 PlayerClass::ArmorType PlayerClass::StringToArmorType(string str) const{
-
     str = Ucase(str);
 
-    if (str == NO_INPUT){
-        return NONE;
-    }
-    else if (str == "BREASTPLATE"){
-        return BREASTPLATE;
-    }
-    else if (str == "CHAINMAIL"){
-        return CHAINMAIL;
-    }
-    else if (str == "LEATHER"){
-        return LEATHER;
-    }
-    else if (str == "TACTICALVEST" || str == "TACTICAL VEST"){
-        return TACTICALVEST;
-    }
-    else{
-        return NONE;
-    }
+    if (str == NO_INPUT) {return NONE;}
+    else if (str == "BREASTPLATE") {return BREASTPLATE;}
+    else if (str == "CHAINMAIL") {return CHAINMAIL;}
+    else if (str == "LEATHER") {return LEATHER;}
+    else if (str == "TACTICALVEST" || str == "TACTICAL VEST") {return TACTICALVEST;}
+    else {return NONE;}
 }
 
 string PlayerClass::ArmorTypeToString(ArmorType armor) const{
@@ -694,11 +639,9 @@ string PlayerClass::ArmorTypeToString(ArmorType armor) const{
         case TACTICALVEST: return "Tactical Vest";
         default: return "None";
     }
-
 }
 
 int PlayerClass::ArmorTypeToDAV(ArmorType aType) const{
-
     switch(aType){
         case NONE: return 0;
         case BREASTPLATE: return 4;
@@ -710,23 +653,11 @@ int PlayerClass::ArmorTypeToDAV(ArmorType aType) const{
 }
 
 bool PlayerClass::IsHuman() const{
-
-    if(IsProtector()){
-        return true;
-    }
-    else{
-        return false;
-    }
+    return IsProtector();
 }
 
 bool PlayerClass::IsZombie() const{
-
-    if (IsCannibal() || IsCrazy()){
-        return true;
-    }
-    else{
-        return false;
-    }
+    return (IsCannibal() || IsCrazy());
 }
 
 string PlayerClass::Ucase(string str) const{

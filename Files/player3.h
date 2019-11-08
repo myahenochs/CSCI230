@@ -4,6 +4,11 @@
 //Program 3 Class Declaration
 //This class is a player that includes weapons and armor.
 
+//To-do:
+    //Rename pClass to something more intuitive
+    //Add loop to output the weapon list
+    //Get rid of extra out statements
+
 #ifndef _PLAYERCLASSH
 #define _PLAYERCLASSH
 
