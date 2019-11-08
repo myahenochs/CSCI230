@@ -573,9 +573,6 @@ void PlayerClass::SetValidWeapon(string newWeapon){
         currentWeapon.name = fWpn;
         fin >> currentWeapon.damage;
     }
-    if (!weaponList.IsPresent(currentWeapon.name)){
-        weaponList.Insert(currentWeapon.name);
-    }
 
     return;
 }
