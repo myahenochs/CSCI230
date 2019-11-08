@@ -20,11 +20,7 @@ const string PlayerClass::NO_INPUT = "NONE";
 //CONSTRUCTORS AND DESTRUCTORS ----------------------------------------
 
 PlayerClass::PlayerClass(){
-    set = false;
-    currentWeapon.set = false;
-    armor.set = false;
-
-    active = false;
+    set = currentWeapon.set = armor.set = active = false;
 }
 
 
@@ -255,10 +251,12 @@ bool PlayerClass::SetPlayer(string newName){
 bool PlayerClass::SetWeapon(string newWeapon){
     bool valid = false;
     if(PlayerSet() && WeaponExists(newWeapon)){
-        valid = true;
-        currentWeapon.set = true;
+        valid = currentWeapon.set = true;
         SetValidWeapon(newWeapon);
-        weaponList.Insert(currentWeapon.name);
+
+        if (!weaponList.IsPresent(currentWeapon.name)){
+            weaponList.Insert(currentWeapon.name);
+        }
     }
     return valid;
 }
@@ -369,21 +367,18 @@ bool PlayerClass::NameExists(string newName, string inFile) const{
 bool PlayerClass::WeaponExists(string newWeapon) const{
     bool valid = false;
     ifstream fin;
-    string fWpn, uWpn;
-
-    uWpn = Ucase(newWeapon);
+    string fWpn, uWpn = Ucase(newWeapon);
 
     fin.open(WPN_FILE.c_str());
     do{
         getline(fin, fWpn, DEL);
-        fWpn = Ucase(fWpn);
-        if (fWpn != uWpn){
+        if (Ucase(fWpn) != uWpn){
             fin.ignore(255, END);
         }
-    } while (fWpn != uWpn && !fin.eof());
+    } while (Ucase(fWpn) != uWpn && !fin.eof());
     fin.close();
 
-    if(fWpn == uWpn){
+    if(Ucase(fWpn) == uWpn){
         valid = true;
     }
 
@@ -466,24 +461,23 @@ void PlayerClass::SetValidPlayer(string newName){
 
 void PlayerClass::SetHuman(string newName){
     ifstream fin;
-    string fName, ufName, uName;
+    string fName;
 
-    uName = Ucase(newName);
+    newName = Ucase(newName);
 
     fin.open(HUMANS_FILE.c_str());
     do{ //Tries to find a match for the name
         getline(fin, fName, DEL);
-        ufName = Ucase(fName);
-        if (ufName != uName){
+        if (Ucase(fName) != newName){
             fin.ignore(255, END);
         }
-    }while (ufName != uName && !fin.eof());
+    }while (Ucase(fName) != newName && !fin.eof());
 
-    if(ufName == uName){ //If found, gets the rest of the info on the line
+    if(Ucase(fName) == newName){ //If found, gets the rest of the info on the line
         char tempChar;
 
         name = fName;
-        pClass = PROTECTOR; //Human player is always PROTECTOR 
+        pClass = PROTECTOR; //Human player is always PROTECTOR
 
         fin >> tempChar;
         fin.ignore(1, DEL);
@@ -507,20 +501,19 @@ void PlayerClass::SetHuman(string newName){
 
 void PlayerClass::SetZombie(string newName){
     ifstream fin;
-    string fName, ufName, uName;
+    string fName;
 
-    uName = Ucase(newName);
+    newName = Ucase(newName);
 
-    fin.open(ZOMBIES_FILE.c_str());
+    fin.open(HUMANS_FILE.c_str());
     do{ //Tries to find a match for the name
         getline(fin, fName, DEL);
-        ufName = Ucase(fName);
-        if (ufName != uName){
+        if (Ucase(fName) != newName){
             fin.ignore(255, END);
         }
-    }while (ufName != uName && !fin.eof());
+    }while (Ucase(fName) != newName && !fin.eof());
 
-    if(fName == uName){  //If found, gets the rest of the info on the line
+    if(Ucase(fName) == newName){ //If found, gets the rest of the info on the line
         char tempChar;
 
         name = fName;
@@ -556,25 +549,20 @@ void PlayerClass::SetZombie(string newName){
 
 void PlayerClass::SetValidWeapon(string newWeapon){
     ifstream fin;
-    string fWpn, uWpn;
-
+    string fWpn;
     newWeapon = Ucase(newWeapon);
 
     fin.open(WPN_FILE.c_str());
     do{ //Tries to find the weapon name
         getline(fin, fWpn, DEL);
-        uWpn = Ucase(fWpn);
-        if (uWpn != newWeapon){
+        if (Ucase(fWpn) != newWeapon){ //Ignores the rest of the line if not found
             fin.ignore(255, END);
         }
-    }while (uWpn != newWeapon && !fin.eof());
+    }while (Ucase(fWpn) != newWeapon && !fin.eof());
 
-    if (uWpn == newWeapon){ //If found, gets the rest of the line
+    if (Ucase(fWpn) == newWeapon){ //If found, gets the rest of the line
         currentWeapon.name = fWpn;
         fin >> currentWeapon.damage;
-    }
-    if (!weaponList.IsPresent(currentWeapon.name)){
-        weaponList.Insert(currentWeapon.name);
     }
 
     return;
