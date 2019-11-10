@@ -72,6 +72,10 @@ int PlayerClass::GetHealth() const{
     
 }
 
+void PlayerClass::GetStats(int stats[]) const{
+
+}
+
 
 bool PlayerClass::IsDead() const{
     bool dead = false;
