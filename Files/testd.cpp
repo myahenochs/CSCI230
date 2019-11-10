@@ -7,12 +7,11 @@ int main(){
     PlayerClass p1, p2;
 
     p1.SetPlayer("P4");
-    p1.Write(cout); cout << endl;
-    cout << "Dead: " << p1.IsDead() << endl;
-    cout << "Active: " << p1.IsActive() << endl;
-    cout << "Health: " << p1.Wounded(-9) << endl;
-    
-    cout << endl;
+    p1.SetWeapon("Dagger");
+    p1.LearnedWeapon("Baretta");
+    p1.LearnedWeapon("baton");
+
+    p1.WriteWeaponHistory(cout);
 
     return 0;
 }

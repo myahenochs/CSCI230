@@ -225,13 +225,16 @@ void PlayerClass::Write(ostream & out) const{
 }
 
 void PlayerClass::WriteWeaponHistory(ostream &out){
+    ItemType item;
     if(!weaponList.IsEmpty()){
         out << name << DEL;
-        out << PlayerTypeChar << DEL;
+        out << PlayerTypeChar(pClass) << DEL;
         weaponList.Reset();
         for(int i = 0; i < weaponList.Length(); i++){
-            //Ask how the fuck to do this on Friday (or look it up?)
+            weaponList.GetNextItem(item);
+            cout << item << DEL;
         }
+        out << endl;
     }
 }
 
