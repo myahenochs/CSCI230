@@ -5,8 +5,10 @@
 //This class is a player that includes weapons and armor.
 
 //To-do:
+    //Make sure that the stored list values are the same as in the file
+    //Implement the stats array
+    //Implement GetStats
     //Rename pClass to something more intuitive
-    //Add loop to output the weapon list
     //Get rid of extra out statements
 
 #ifndef _PLAYERCLASSH
@@ -28,6 +30,7 @@ class PlayerClass{
         enum PlayerType {PROTECTOR, CANNIBAL, CRAZY};
         enum ArmorType {NONE, BREASTPLATE, CHAINMAIL, LEATHER, TACTICALVEST};
         enum CampaignType {GATHER, SPY, TRAVELER, WARRIOR};
+        enum StatType {HEALTH, DEX, INT, BRAWN};
 
         struct DateRec{
             int day, month, year;
@@ -187,12 +190,15 @@ class PlayerClass{
     static const int END;              //End line character.
     static const string NO_INPUT;      //String that represents no input data for the field.
 
+    #define STAT_AMNT 4
+
 
     //PRIVATE DATA --------------------------------------------
 
         string name;
         PlayerType pClass;
         TypeRec type;
+        int stats[STAT_AMNT];
         int brawn, dexterity, intelligence, health;
         ArmorRec armor;
         WpnRec currentWeapon;

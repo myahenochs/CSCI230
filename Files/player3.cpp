@@ -14,7 +14,7 @@ const string PlayerClass::ZOMBIES_FILE = "zombies.in";
 const char PlayerClass::DEL = '#';            
 const char PlayerClass::DATE_SEP = '/';     
 const int PlayerClass::END = '\n';           
-const string PlayerClass::NO_INPUT = "NONE";  
+const string PlayerClass::NO_INPUT = "NONE";
 
 
 //CONSTRUCTORS AND DESTRUCTORS ----------------------------------------
@@ -30,46 +30,35 @@ string PlayerClass::Name() const{
     if(PlayerSet()){
         return name;
     }
-    else{
-        return "";
-    }
+    return "";
 }
 
 int PlayerClass::GetBrawn() const{
     if(PlayerSet()){
-        return brawn;
+        return stats[BRAWN];
     }
-    else{
-        return 0;
-    }
+    return 0;
 }
 
 int PlayerClass::GetDex() const{
     if(PlayerSet()){
-        return dexterity;
+        return stats[DEX];
     }
-    else{
-        return 0;
-    }
+    return 0;
 }
 
 int PlayerClass::GetIntel() const{
     if(PlayerSet()){
-        return intelligence;
+        return stats[INT];
     }
-    else{
-        return 0;
-    }
+    return 0;
 }
 
 int PlayerClass::GetHealth() const{
     if(PlayerSet()){
-        return health;
+        return stats[HEALTH];
     }
-    else{
-        return 0;
-    }
-    
+    return 0;
 }
 
 void PlayerClass::GetStats(int stats[]) const{
@@ -80,11 +69,10 @@ void PlayerClass::GetStats(int stats[]) const{
 bool PlayerClass::IsDead() const{
     bool dead = false;
     if(PlayerSet()){
-        if(IsZombie() || health == 0){
+        if(IsZombie() || stats[HEALTH] == 0){
             dead = true;
         }
     }
-
     return dead;
 }
 
@@ -132,7 +120,7 @@ bool PlayerClass::KnowWeapon(string weapon) const{
 }
 
 string PlayerClass::WeaponName() const{
-    if(PlayerSet()){
+    if(PlayerSet() && HasWeapon()){
         return currentWeapon.name;
     }
     else{
@@ -141,13 +129,10 @@ string PlayerClass::WeaponName() const{
 }
 
 int PlayerClass::WeaponDamage() const{
-    if(PlayerSet()){
+    if(HasWeapon()){
         return currentWeapon.damage;
     }
-    else{
-        return 0;
-    }
-    
+    return 0;
 }
 
 
@@ -226,7 +211,7 @@ void PlayerClass::Write(ostream & out) const{
 
 void PlayerClass::WriteWeaponHistory(ostream &out){
     ItemType item;
-    if(!weaponList.IsEmpty()){
+    if(PlayerSet() && !weaponList.IsEmpty()){
         out << name << DEL;
         out << PlayerTypeChar(pClass) << DEL;
         weaponList.Reset();
@@ -244,11 +229,8 @@ void PlayerClass::WriteWeaponHistory(ostream &out){
 bool PlayerClass::SetPlayer(string newName){
     bool valid = false;
     if (ValidatePlayer(newName)){
-        valid = true;
-        set = true;
-        active = true;
-        armor.set = false;
-        currentWeapon.set = false;
+        valid = set = active = true;
+        armor.set = currentWeapon.set = false;
         SetValidPlayer(newName);
     }
 
@@ -260,10 +242,7 @@ bool PlayerClass::SetWeapon(string newWeapon){
     if(PlayerSet() && WeaponExists(newWeapon)){
         valid = currentWeapon.set = true;
         SetValidWeapon(newWeapon);
-
-        if (!weaponList.IsPresent(currentWeapon.name)){
-            weaponList.Insert(currentWeapon.name);
-        }
+        LearnedWeapon(currentWeapon.name);
     }
     return valid;
 }
@@ -287,11 +266,10 @@ void PlayerClass::LoseArmor(){
 }
 
 void PlayerClass::LoseWeapon(){
-    if (PlayerSet()){
+    if (PlayerSet() && HasWeapon()){
         weaponList.Delete(currentWeapon.name);
         currentWeapon.set = false;
     }
-    return;
 }
 
 bool PlayerClass::SwapWeapon(string weapon){
@@ -303,11 +281,11 @@ bool PlayerClass::SwapWeapon(string weapon){
 }
 
 bool PlayerClass::LearnedWeapon(string weapon){
-    bool learn = PlayerSet() && WeaponExists(weapon);
-    if(learn){
+    bool valid = WeaponExists(weapon) && !weaponList.IsPresent(weapon);
+    if(PlayerSet() && valid){
         weaponList.Insert(weapon);
     }
-    return learn;
+    return valid;
 }
 
 void PlayerClass::Amnesia(){
@@ -317,13 +295,13 @@ void PlayerClass::Amnesia(){
 
 int PlayerClass::Wounded(int damage){
     if(PlayerSet() && IsActive() && damage > 0){
-        health = health - damage;
-        if (health <= 0){
-            health = 0;
+        stats[HEALTH] = stats[HEALTH] - damage;
+        if (stats[HEALTH] <= 0){
+            stats[HEALTH] = 0;
             MakeInActive();
         }
     }
-    return health;
+    return stats[HEALTH];
 }
 
 void PlayerClass::MakeInActive(){
@@ -475,16 +453,16 @@ void PlayerClass::SetHuman(string newName){
         fin.ignore(1, DEL);
         type.human.campaign = CharToCampaignType(tempChar);
 
-        fin >> brawn;
+        fin >> stats[BRAWN];
         fin.ignore(1, DEL);
 
-        fin >> dexterity;
+        fin >> stats[DEX];
         fin.ignore(1, DEL);
 
-        fin >> intelligence;
+        fin >> stats[INT];
         fin.ignore(1, DEL);
 
-        fin >> health;
+        fin >> stats[HEALTH];
     }
     fin.close();
 }
@@ -495,7 +473,7 @@ void PlayerClass::SetZombie(string newName){
 
     newName = Ucase(newName);
 
-    fin.open(HUMANS_FILE.c_str());
+    fin.open(ZOMBIES_FILE.c_str());
     do{ //Tries to find a match for the name
         getline(fin, fName, DEL);
         if (Ucase(fName) != newName){
@@ -521,16 +499,16 @@ void PlayerClass::SetZombie(string newName){
         fin >> type.zombie.iDate.year;
         fin.ignore(1, DEL);
 
-        fin >> brawn;
+        fin >> stats[BRAWN];
         fin.ignore(1, DEL);
 
-        fin >> dexterity;
+        fin >> stats[DEX];
         fin.ignore(1, DEL);
 
-        fin >> intelligence;
+        fin >> stats[INT];
         fin.ignore(1, DEL);
 
-        fin >> health;
+        fin >> stats[HEALTH];
     }
     fin.close();
 }

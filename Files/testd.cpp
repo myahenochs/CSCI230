@@ -6,12 +6,8 @@ int main(){
 
     PlayerClass p1, p2;
 
-    p1.SetPlayer("P4");
-    p1.SetWeapon("Dagger");
-    p1.LearnedWeapon("Baretta");
-    p1.LearnedWeapon("baton");
-
-    p1.WriteWeaponHistory(cout);
+    p1.SetPlayer("c1");
+    p1.Write(cout);
 
     return 0;
 }
