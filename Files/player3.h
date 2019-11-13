@@ -5,9 +5,6 @@
 //This class is a player that includes weapons and armor.
 
 //To-do:
-    //Make sure that the stored list values are the same as in the file
-    //Implement the stats array
-    //Implement GetStats
     //Rename pClass to something more intuitive
     //Get rid of extra out statements
 
@@ -226,6 +223,11 @@ class PlayerClass{
         //Narrative: Finds the user-input weapon inside of the weapons file.
         //Pre-condition: A valid string must be input.
         //Post-condition: Returns true if the weapon exists, false otherwise.
+
+        string FileWeaponName(string newWeapon) const;
+        //
+        //
+        //
 
         bool ArmorExists(string newArmor) const;
         //Narrative: Checks if the armor is one of the ArmorTypes other than NONE.

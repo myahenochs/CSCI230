@@ -61,8 +61,17 @@ int PlayerClass::GetHealth() const{
     return 0;
 }
 
-void PlayerClass::GetStats(int stats[]) const{
-
+void PlayerClass::GetStats(int in[]) const{
+    if(PlayerSet()){
+        for(int i = 0; i < STAT_AMNT; i++){
+            in[i] = stats[i];
+        }
+    }
+    else{
+        for(int i = 0; i < STAT_AMNT; i++){
+            in[i] = 0;
+        }
+    }
 }
 
 
@@ -141,7 +150,10 @@ bool PlayerClass::HasArmor() const{
 }
 
 string PlayerClass::ArmorName() const{
-    return ArmorTypeToString(armor.name);
+    if(HasArmor()){
+        return ArmorTypeToString(armor.name);
+    }
+    return "";
 }
 
 int PlayerClass::ArmorDAV() const{
@@ -283,7 +295,7 @@ bool PlayerClass::SwapWeapon(string weapon){
 bool PlayerClass::LearnedWeapon(string weapon){
     bool valid = WeaponExists(weapon) && !weaponList.IsPresent(weapon);
     if(PlayerSet() && valid){
-        weaponList.Insert(weapon);
+        weaponList.Insert(FileWeaponName(weapon));
     }
     return valid;
 }
@@ -364,6 +376,28 @@ bool PlayerClass::WeaponExists(string newWeapon) const{
     }
 
     return valid;
+}
+
+string PlayerClass::FileWeaponName(string newWeapon) const{
+    ifstream fin;
+    string fWpn, uWpn = Ucase(newWeapon);
+
+    if(WeaponExists(newWeapon)){
+        fin.open(WPN_FILE.c_str());
+        do{
+            getline(fin, fWpn, DEL);
+            if (Ucase(fWpn) != uWpn){
+                fin.ignore(255, END);
+            }
+        } while (Ucase(fWpn) != uWpn && !fin.eof());
+        fin.close();
+
+        if(Ucase(fWpn) == uWpn){
+            return fWpn;
+        }
+    }
+
+    return "";
 }
 
 bool PlayerClass::ArmorExists(string newArmor) const{
